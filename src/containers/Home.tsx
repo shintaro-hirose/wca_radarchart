@@ -1,7 +1,6 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import MyRadarChart from '../components/MyRadarChart'
 import axios from 'axios'
-// import { UserRecord } from 'firebase-functions/lib/providers/auth'
 
 interface ResultDetail {
     "best": number,
@@ -10,59 +9,39 @@ interface ResultDetail {
     "country_rank": number
 }
 
-interface FetchedUserData {
-    "person": {
-        "personal_records": string,
-        "name": string,
+interface UserInfo {
+    "personal_records": string,
+    "name": string,
+    "url": string,
+    "avatar":{
         "url": string,
-        "avatar":{
-            "url": string,
-            "thumb_url": string,
-            "is_default": boolean
-        },
-        [param: string]: any
+        "thumb_url": string,
+        "is_default": boolean
     },
+    // [param: string]: any
+}
+
+interface FetchedUserData {
+    "person": UserInfo,
     "personal_records": {
         [param: string]: {
             "single": ResultDetail,
             "average"?: ResultDetail
         }
     },
-    [param: string]: any
-    
+    // [param: string]: any
 }
 
 interface RadarChartData{
-    eventName: string
-    point: number
+    "eventName": string,
+    "myPoint": number,
+    "rivalPoint": number    
 }
 
 const mbldSolved = (value: number) => {
-    const missed = value % 100;
     const points = 99 - (Math.floor(value / 1e7) % 100);
-    const solved = points + missed;
-    return solved;
+    return points;
 }
-
-// const eventInfos: [string, [number,number]][] = [
-//     ["333", [347,2000]],
-//     ["222", [49,750]],
-//     ["444", [1742,8000]],
-//     ["555", [3492,14000]],
-//     ["666", [6951,24000]],
-//     ["777", [10089,36000]],
-//     ["333bf", [1550,10000]],
-//     ["333fm", [16,40]],
-//     ["333oh", [682,4500]],
-//     ["clock", [329,1500]],
-//     ["minx", [2722,16000]],
-//     ["pyram", [91,1200]],
-//     ["skewb", [93,1200]],
-//     ["sq1", [459,5000]],
-//     ["444bf", [6251,90000]],
-//     ["555bf", [14162,150000]],
-//     ["333mbf", [mbldSolved(410358601), 6]]
-// ]
 
 const eventInfos: [string, [number,number]][] = [
     ["333", [347,2000]],
@@ -71,7 +50,6 @@ const eventInfos: [string, [number,number]][] = [
     ["555", [3492,14000]],
     ["666", [6951,24000]],
     ["777", [10089,36000]],
-    ["333bf", [1550,10000]],
     ["333fm", [16,40]],
     ["333oh", [682,4500]],
     ["clock", [329,1500]],
@@ -79,94 +57,179 @@ const eventInfos: [string, [number,number]][] = [
     ["pyram", [91,1200]],
     ["skewb", [93,1200]],
     ["sq1", [459,5000]],
+    ["333bf", [1550,10000]],
     ["444bf", [6251,90000]],
     ["555bf", [14162,150000]],
-    ["333mbf", [mbldSolved(410358601), 6]]
+    ["333mbf", [mbldSolved(410358601), 3]]
 ]
-
-const makeRadarChartData = (data: FetchedUserData) => {
-    const radarChartData: RadarChartData[] = [];
+const getPointData = (data: FetchedUserData) => {
+    const points: number[] = [];
     eventInfos.forEach(eventInfo => {
-        let point:number = 0;
+        let point:number = 10;
         if(data.personal_records[eventInfo[0]] !== undefined){
             let value = data.personal_records[eventInfo[0]].single.best;
             if(eventInfo[0] === "333mbf"){
                 // point = Math.floor(100 * (50 + (mbldSolved(value) - eventInfo[1][1]) / 2) / (50 + (eventInfo[1][0] - eventInfo[1][1])/2))
-                point = Math.floor(100 * (mbldSolved(value) / eventInfo[1][0]) * (mbldSolved(value) / eventInfo[1][0]));
+                // point = Math.floor(100 * (mbldSolved(value) / eventInfo[1][0]) * (mbldSolved(value) / eventInfo[1][0]));
+                point = Math.floor(50 + (mbldSolved(value) - eventInfo[1][1]) * 50 / (eventInfo[1][0] - eventInfo[1][1]));
             } else {
                 // point = Math.floor(100 * (50 - (value - eventInfo[1][1])/ 2) / (50 - (eventInfo[1][0] - eventInfo[1][1])/2))
-                point = Math.floor(100 * (eventInfo[1][0] / value) * (eventInfo[1][0] / value));
+                // point = Math.floor(100 * (eventInfo[1][0] / value) * (eventInfo[1][0] / value));
+                point = Math.floor(50 + (eventInfo[1][1] - value) * 50 / (eventInfo[1][1] - eventInfo[1][0]));
             }
-            radarChartData.push({
-                "eventName": eventInfo[0],
-                "point":point
-            })
         }
-        console.log(eventInfo[0])
-        console.log(point)
+        point = Math.max(point, 10)
+        // radarChartData.push({
+        //     "eventName": eventInfo[0],
+        //     "point":point
+        // })
+        points.push(point)
     })
-    return radarChartData;
+    return points;
+}
+
+const fetchData = async(wcaId: string) => {
+    const url = `https://www.worldcubeassociation.org/api/v0/persons/${wcaId}`
+    const response = await axios.get(url)
+    return response.data
 }
 
 const Home = () => {
-    const [rawData, setRawData] = useState<FetchedUserData | null>(null)
     const [radarChartData, setRadarChartData] = useState<RadarChartData[]>([])
     const [hadError, setHadError] = useState(false)
-    const [wid, setWid] = useState('');
     const [loading, setLoading] = useState(false);
+    const [myUserInfo, setMyUserInfo] = useState<UserInfo | null>(null);
+    const [rivalUserInfo, setRivalUserInfo] = useState<UserInfo | null>(null);
+    const [myPointData, setMyPointData] = useState<number[]>([]);
+    const [rivalPointData, setRivalPointData] = useState<number[]>([]);
+    const [myWcaId, setMyWcaId] = useState('');
+    const [rivalWcaId, setRivalWcaId] = useState('');
+    const [searchedIds, setSearchedIds] = useState<string[]>([]);
 
-    const fetchData = async() => {
-        setLoading(true);
-        await axios.get(`https://www.worldcubeassociation.org/api/v0/persons/${wid}`)
-        .then(res => {
-            setRawData(res.data)
-            setHadError(false);
-            return res;
+    // set my radarchart
+    // useEffect(() => {
+    //     if(!rawData)return;
+    //     setMyPointData(getPointData(rawData));
+    // }, [rawData])
+
+    useEffect(() => {
+        let newRadarChartData: RadarChartData[] = [];
+        eventInfos.forEach((eventInfo, idx) => {
+            let myPoint: number = 0;
+            let rivalPoint: number = 0;
+            if(idx < myPointData.length) myPoint = myPointData[idx]
+            if(idx < rivalPointData.length) rivalPoint = rivalPointData[idx]
+            // newRadarChartData.push({
+            //     "eventName": eventInfo[0],
+            //     "myPoint":myPoint,
+            //     "rivalPoint":rivalPoint
+            // })
+            newRadarChartData = [
+                ...newRadarChartData,
+                {
+                    "eventName": eventInfo[0],
+                    "myPoint":myPoint,
+                    "rivalPoint":rivalPoint
+                }
+            ]
         })
-        .then(res => {
-            if(res.data){
-                setRadarChartData(makeRadarChartData(res.data));
-            }
-        })
-        .catch(error => {
-            setHadError(true);
-            console.log(error)
-        });
-        setLoading(false);
+        setRadarChartData(newRadarChartData)
+
+    }, [myPointData, rivalPointData])
+
+    const handleMyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setMyWcaId(e.target.value);
     }
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setWid(e.target.value);
+    const handleRivalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRivalWcaId(e.target.value);
     } 
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleMySubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        fetchData();
-        
+        setLoading(true);
+        fetchData(myWcaId)
+        .then((data : FetchedUserData) => {
+            setMyUserInfo(data.person);
+            setMyPointData(getPointData(data));
+            setSearchedIds([...searchedIds, myWcaId])
+            setHadError(false)
+        })
+        .catch(err => {
+            console.log(err)
+            setHadError(true)
+        })
+        setLoading(false)
+    }
+
+    const handleRivalSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        fetchData(rivalWcaId)
+        .then((data : FetchedUserData) => {
+            setRivalUserInfo(data.person);
+            setRivalPointData(getPointData(data));
+            setSearchedIds([...searchedIds, rivalWcaId])
+            setHadError(false)
+        })
+        .catch(err => {
+            console.log(err)
+            setHadError(true)
+        })
+        setLoading(false)
     }
 
     return (
         <div>
-            <MyRadarChart userRecords={radarChartData}/>
-            <form onSubmit={handleSubmit}>
-                <input type="text" onChange={handleInputChange} value={wid}/>
-                <button type="submit" disabled={loading}>fetch data</button>
-            </form>
+            {
+                radarChartData.length === 0 ? '' : <MyRadarChart userRecords={radarChartData}/>
+            }
             <p>
-                {hadError ? 'fetch data error: please input valid id' : ''}
+                {hadError ? 'Error! Something Went Wrong!' : ''}
             </p>
             <p>
                 {loading ? 'loading' : ''}
             </p>
+            <p>Your WCAID</p>
+            <form onSubmit={handleMySubmit}>
+                <input type="text" onChange={handleMyInputChange} value={myWcaId}/>
+                <button type="submit" disabled={loading}>fetch my data</button>
+            </form>
+            <p>Rivals WCAID</p>
+            <form onSubmit={handleRivalSubmit}>
+                <input type="text" onChange={handleRivalInputChange} value={rivalWcaId}/>
+                <button type="submit" disabled={loading}>fetch rival data</button>
+            </form>
             <p>
-                {rawData ? rawData.person.name : ''}
-            </p>
-            <p>
-                {/* {rawData ? rawData.personal_records["333"].single.world_rank : ''} */}
+                {myUserInfo ? myUserInfo.name : ''}
             </p>
             <img
+            width={200}
+            height={200}
             alt="avatar"
-            src={rawData ? rawData.person.avatar.thumb_url : 'https://www.worldcubeassociation.org/assets/missing_avatar_thumb-f0ea801c804765a22892b57636af829edbef25260a65d90aaffbd7873bde74fc.png'}
+            src={myUserInfo ? myUserInfo.avatar.url : 'https://www.worldcubeassociation.org/assets/missing_avatar_thumb-f0ea801c804765a22892b57636af829edbef25260a65d90aaffbd7873bde74fc.png'}
             />
+            <p>
+                {rivalUserInfo ? rivalUserInfo.name : ''}
+            </p>
+            <img
+            width={200}
+            height={200}
+            alt="avatar"
+            src={rivalUserInfo ? rivalUserInfo.avatar.url : 'https://www.worldcubeassociation.org/assets/missing_avatar_thumb-f0ea801c804765a22892b57636af829edbef25260a65d90aaffbd7873bde74fc.png'}
+            />
+            <ul>
+                {
+                    searchedIds.map((data, idx) => {
+                        return(
+                            <li key={idx}>
+                                <p>
+                                    {data}
+                                </p>
+                            </li>
+                        )
+                    })
+                }
+            </ul>
             
         </div>
     )
