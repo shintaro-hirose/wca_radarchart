@@ -10,7 +10,7 @@ interface ResultDetail {
 }
 
 interface UserInfo {
-    "personal_records": string,
+    "wca_id": string,
     "name": string,
     "url": string,
     "avatar":{
@@ -89,7 +89,7 @@ const getPointData = (data: FetchedUserData) => {
 }
 
 const fetchData = async(wcaId: string) => {
-    const url = `https://www.worldcubeassociation.org/api/v0/persons/${wcaId}`
+    const url = `${process.env.REACT_APP_API_URL}/persons/${wcaId}`
     const response = await axios.get(url)
     return response.data
 }
@@ -206,7 +206,7 @@ const Home = () => {
             width={200}
             height={200}
             alt="avatar"
-            src={myUserInfo ? myUserInfo.avatar.url : 'https://www.worldcubeassociation.org/assets/missing_avatar_thumb-f0ea801c804765a22892b57636af829edbef25260a65d90aaffbd7873bde74fc.png'}
+            src={myUserInfo ? myUserInfo.avatar.url : process.env.REACT_APP_NOUSER_PNG_URL}
             />
             <p>
                 {rivalUserInfo ? rivalUserInfo.name : ''}
@@ -215,7 +215,7 @@ const Home = () => {
             width={200}
             height={200}
             alt="avatar"
-            src={rivalUserInfo ? rivalUserInfo.avatar.url : 'https://www.worldcubeassociation.org/assets/missing_avatar_thumb-f0ea801c804765a22892b57636af829edbef25260a65d90aaffbd7873bde74fc.png'}
+            src={rivalUserInfo ? rivalUserInfo.avatar.url : process.env.REACT_APP_NOUSER_PNG_URL}
             />
             <ul>
                 {
