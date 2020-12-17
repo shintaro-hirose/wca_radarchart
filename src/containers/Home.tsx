@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import MyRadarChart from '../components/MyRadarChart'
 import axios from 'axios'
+import { ColorResult, RGBColor, SketchPicker } from 'react-color';
 
 interface ResultDetail {
     "best": number,
@@ -105,6 +106,8 @@ const Home = () => {
     const [myWcaId, setMyWcaId] = useState('');
     const [rivalWcaId, setRivalWcaId] = useState('');
     const [searchedIds, setSearchedIds] = useState<string[]>([]);
+    const [myColor, setMyColor] = useState<[string, RGBColor]>(['#D4293F',{r:212, g: 41, b: 63, a:0.5}]);
+    const [rivalColor, setRivalColor] = useState<[string, RGBColor]>(['#16C970',{r:22, g: 201, b: 112, a:0.5}]);
 
     // set my radarchart
     // useEffect(() => {
@@ -178,10 +181,23 @@ const Home = () => {
         setLoading(false)
     }
 
+    const handleMyColorChange = (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => {
+        setMyColor([color.hex, color.rgb])
+    }
+
+    const handleRivalColorChange = (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => {
+        setRivalColor([color.hex, color.rgb])
+    }
+
     return (
         <div>
             {
-                radarChartData.length === 0 ? '' : <MyRadarChart userRecords={radarChartData}/>
+                radarChartData.length === 0 ? '' : 
+                <MyRadarChart 
+                    userRecords={radarChartData}
+                    myColor={myColor}
+                    rivalColor={rivalColor}
+                />
             }
             <p>
                 {hadError ? 'Error! Something Went Wrong!' : ''}
@@ -189,6 +205,14 @@ const Home = () => {
             <p>
                 {loading ? 'loading' : ''}
             </p>
+            <SketchPicker 
+                onChange={handleMyColorChange}
+                color={myColor[1]}
+            />
+            <SketchPicker 
+                onChange={handleRivalColorChange}
+                color={rivalColor[1]}
+            />
             <p>Your WCAID</p>
             <form onSubmit={handleMySubmit}>
                 <input type="text" onChange={handleMyInputChange} value={myWcaId}/>

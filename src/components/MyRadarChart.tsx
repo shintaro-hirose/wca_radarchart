@@ -1,11 +1,14 @@
 import React from 'react'
+import { RGBColor } from 'react-color';
 import {Legend, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from 'recharts';
 
 type Props = {
     userRecords: object[];
+    myColor: [string, RGBColor]
+    rivalColor: [string, RGBColor]
 }
 
-const MyRadarChart: React.FC<Props> = ({userRecords}) => {
+const MyRadarChart: React.FC<Props> = ({userRecords, myColor, rivalColor}) => {
     return (
         <RadarChart 
         outerRadius={90} 
@@ -19,16 +22,16 @@ const MyRadarChart: React.FC<Props> = ({userRecords}) => {
             <Radar 
             name="Rival" 
             dataKey="rivalPoint" 
-            stroke="blue" 
-            fill="blue"
-            fillOpacity={0.5} 
+            stroke={rivalColor[0]}
+            fill={rivalColor[0]}
+            fillOpacity={rivalColor[1].a} 
             animationEasing="ease-out"/>
             <Radar 
             name="You" 
             dataKey="myPoint" 
-            stroke="red" 
-            fill="red"
-            fillOpacity={0.5} 
+            stroke={myColor[0]}
+            fill={myColor[0]}
+            fillOpacity={myColor[1].a} 
             animationEasing="ease-out"/>
             <Legend />
         </RadarChart>
