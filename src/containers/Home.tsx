@@ -1,89 +1,64 @@
 import React, {useState, useEffect} from 'react'
 import MyRadarChart from '../components/MyRadarChart'
 import axios from 'axios'
-import { ColorResult, RGBColor, SketchPicker } from 'react-color';
+import { ChromePicker, ColorResult } from 'react-color';
+import { AutoComplete, Col, Row } from 'antd';
+import { eventInfos } from '../utils/eventInfo';
+import { mbldSolved } from '../utils/decodeMbld';
+import 'antd/dist/antd.css';
 
 interface ResultDetail {
-    "best": number,
-    "world_rank": number,
-    "continent_rank": number,
+    "best": number
+    "world_rank": number
+    "continent_rank": number
     "country_rank": number
 }
 
-interface UserInfo {
-    "wca_id": string,
-    "name": string,
-    "url": string,
+interface Profile {
+    "wca_id": string
+    "name": string
+    "url": string
     "avatar":{
-        "url": string,
-        "thumb_url": string,
+        "url": string
+        "thumb_url": string
         "is_default": boolean
-    },
-    // [param: string]: any
+    }
 }
 
 interface FetchedUserData {
-    "person": UserInfo,
+    "person": Profile
     "personal_records": {
         [param: string]: {
-            "single": ResultDetail,
+            "single": ResultDetail
             "average"?: ResultDetail
         }
-    },
-    // [param: string]: any
+    }
+}
+
+interface SearchedUserData {
+    name: string
+    wca_id: string
 }
 
 interface RadarChartData{
-    "eventName": string,
-    "myPoint": number,
-    "rivalPoint": number    
+    "eventName": string
+    "myPoint": number
+    "rivalPoint": number
 }
 
-const mbldSolved = (value: number) => {
-    const points = 99 - (Math.floor(value / 1e7) % 100);
-    return points;
-}
-
-const eventInfos: [string, [number,number]][] = [
-    ["333", [347,2000]],
-    ["222", [49,750]],
-    ["444", [1742,8000]],
-    ["555", [3492,14000]],
-    ["666", [6951,24000]],
-    ["777", [10089,36000]],
-    ["333fm", [16,40]],
-    ["333oh", [682,4500]],
-    ["clock", [329,1500]],
-    ["minx", [2722,16000]],
-    ["pyram", [91,1200]],
-    ["skewb", [93,1200]],
-    ["sq1", [459,5000]],
-    ["333bf", [1550,10000]],
-    ["444bf", [6251,90000]],
-    ["555bf", [14162,150000]],
-    ["333mbf", [mbldSolved(410358601), 3]]
-]
 const getPointData = (data: FetchedUserData) => {
     const points: number[] = [];
     eventInfos.forEach(eventInfo => {
         let point:number = 10;
-        if(data.personal_records[eventInfo[0]] !== undefined){
-            let value = data.personal_records[eventInfo[0]].single.best;
-            if(eventInfo[0] === "333mbf"){
-                // point = Math.floor(100 * (50 + (mbldSolved(value) - eventInfo[1][1]) / 2) / (50 + (eventInfo[1][0] - eventInfo[1][1])/2))
-                // point = Math.floor(100 * (mbldSolved(value) / eventInfo[1][0]) * (mbldSolved(value) / eventInfo[1][0]));
-                point = Math.floor(50 + (mbldSolved(value) - eventInfo[1][1]) * 50 / (eventInfo[1][0] - eventInfo[1][1]));
+        if(data.personal_records[eventInfo.eventName] !== undefined){
+            let value = data.personal_records[eventInfo.eventName].single.best;
+            if(eventInfo.eventName === "333mbf"){
+                point = Math.floor(50 + (mbldSolved(value) - eventInfo.averagePoint) * 50 / (eventInfo.worldPoint - eventInfo.averagePoint));
             } else {
-                // point = Math.floor(100 * (50 - (value - eventInfo[1][1])/ 2) / (50 - (eventInfo[1][0] - eventInfo[1][1])/2))
-                // point = Math.floor(100 * (eventInfo[1][0] / value) * (eventInfo[1][0] / value));
-                point = Math.floor(50 + (eventInfo[1][1] - value) * 50 / (eventInfo[1][1] - eventInfo[1][0]));
+                point = Math.floor(50 + (eventInfo.averagePoint - value) * 50 / (eventInfo.averagePoint - eventInfo.worldPoint));
             }
         }
         point = Math.max(point, 10)
-        // radarChartData.push({
-        //     "eventName": eventInfo[0],
-        //     "point":point
-        // })
         points.push(point)
     })
     return points;
@@ -95,167 +70,236 @@ const fetchData = async(wcaId: string) => {
     return response.data
 }
 
+const searchData = async(searchKey: string) => {
+    const url = `${process.env.REACT_APP_API_URL}/search/users?q=${searchKey}&persons_table=true`
+    const options: SearchOption[] = []
+    await axios.get(url)
+    .then((response) => {
+        const results: SearchedUserData[] = response.data.result;
+        for(let i = 0; i < results.length && i < 3; i++){
+            options.push({
+                value: results[i].wca_id,
+                label: `${results[i].name}[${results[i].wca_id}]`
+            })
+        }
+    })
+    return options
+}
+
+interface SearchOption {
+    label: string
+    value: string
+}
+
+interface UserData {
+    profile: Profile | null
+    points: number[]
+    color: ColorResult
+    searchOptions: SearchOption[]
+}
+
 const Home = () => {
     const [radarChartData, setRadarChartData] = useState<RadarChartData[]>([])
-    const [hadError, setHadError] = useState(false)
-    const [loading, setLoading] = useState(false);
-    const [myUserInfo, setMyUserInfo] = useState<UserInfo | null>(null);
-    const [rivalUserInfo, setRivalUserInfo] = useState<UserInfo | null>(null);
-    const [myPointData, setMyPointData] = useState<number[]>([]);
-    const [rivalPointData, setRivalPointData] = useState<number[]>([]);
-    const [myWcaId, setMyWcaId] = useState('');
-    const [rivalWcaId, setRivalWcaId] = useState('');
-    const [searchedIds, setSearchedIds] = useState<string[]>([]);
-    const [myColor, setMyColor] = useState<[string, RGBColor]>(['#D4293F',{r:212, g: 41, b: 63, a:0.5}]);
-    const [rivalColor, setRivalColor] = useState<[string, RGBColor]>(['#16C970',{r:22, g: 201, b: 112, a:0.5}]);
-
-    // set my radarchart
-    // useEffect(() => {
-    //     if(!rawData)return;
-    //     setMyPointData(getPointData(rawData));
-    // }, [rawData])
+    const [uiState, setUiState] = useState({
+        hadFetchError: false,
+        isFetching: false,
+        isSearching: false
+    })
+    const [myData, setMyData] = useState<UserData>({
+        profile: null,
+        points: [],
+        color: {hex: 'red', rgb: {r:255,g:10,b:10,a:0.5}, hsl: {h:0, s:0, l:0}},
+        searchOptions:[]
+    })
+    const [rivalData, setRivalData] = useState<UserData>({
+        profile: null,
+        points: [],
+        color: {hex: 'green', rgb: {r:10,g:255,b:10,a:0.5}, hsl: {h:0, s:0, l:0}},
+        searchOptions:[]
+    })
+    const [fetchedToggle, setFetchedToggle] = useState(false); // useEffect発動するため
 
     useEffect(() => {
-        let newRadarChartData: RadarChartData[] = [];
+        console.log('useEfect invoked')
+        console.log('rivalData.points.length: ' + rivalData.points.length)
+        const newRadarChartData: RadarChartData[] = [];
         eventInfos.forEach((eventInfo, idx) => {
-            let myPoint: number = 0;
-            let rivalPoint: number = 0;
-            if(idx < myPointData.length) myPoint = myPointData[idx]
-            if(idx < rivalPointData.length) rivalPoint = rivalPointData[idx]
-            // newRadarChartData.push({
-            //     "eventName": eventInfo[0],
-            //     "myPoint":myPoint,
-            //     "rivalPoint":rivalPoint
-            // })
-            newRadarChartData = [
-                ...newRadarChartData,
-                {
-                    "eventName": eventInfo[0],
-                    "myPoint":myPoint,
-                    "rivalPoint":rivalPoint
-                }
-            ]
+            let myPoint: number = 10;
+            let rivalPoint: number = 10;
+            if(idx < myData.points.length) myPoint = myData.points[idx]
+            if(idx < rivalData.points.length) rivalPoint = rivalData.points[idx]
+            newRadarChartData.push({
+                "eventName": eventInfo.eventName,
+                "myPoint":myPoint,
+                "rivalPoint":rivalPoint
+            })
         })
         setRadarChartData(newRadarChartData)
 
-    }, [myPointData, rivalPointData])
-
-    const handleMyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMyWcaId(e.target.value);
-    }
-    const handleRivalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setRivalWcaId(e.target.value);
-    } 
-
-    const handleMySubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoading(true);
-        fetchData(myWcaId)
-        .then((data : FetchedUserData) => {
-            setMyUserInfo(data.person);
-            setMyPointData(getPointData(data));
-            setSearchedIds([...searchedIds, myWcaId])
-            setHadError(false)
-        })
-        .catch(err => {
-            console.log(err)
-            setHadError(true)
-        })
-        setLoading(false)
-    }
-
-    const handleRivalSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoading(true);
-        fetchData(rivalWcaId)
-        .then((data : FetchedUserData) => {
-            setRivalUserInfo(data.person);
-            setRivalPointData(getPointData(data));
-            setSearchedIds([...searchedIds, rivalWcaId])
-            setHadError(false)
-        })
-        .catch(err => {
-            console.log(err)
-            setHadError(true)
-        })
-        setLoading(false)
-    }
+    }, [fetchedToggle])
 
     const handleMyColorChange = (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => {
-        setMyColor([color.hex, color.rgb])
+        setMyData({...myData, color})
     }
 
     const handleRivalColorChange = (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => {
-        setRivalColor([color.hex, color.rgb])
+        setRivalData({...rivalData, color})
+    }
+
+    // 自動補完用
+    const handleMyInputChange = (value: string) => {
+        if(uiState.isFetching)return;
+        console.log('handleMyInputChange invoked')
+        setUiState({...uiState, isSearching: true})
+        searchData(value)
+        .then((options: SearchOption[]) => {
+            setMyData({...myData, searchOptions: options})
+        })
+        .catch(err => {
+            console.log(err)
+        })
+        setUiState({...uiState, isSearching: false})
+    }
+
+    // データ取得用
+    const handleMySelect = (value: string) => {
+        if(uiState.isSearching)return;
+        console.log('handleMySelect invoked')
+        setUiState({...uiState, isFetching: true})
+        fetchData(value)
+        .then((data : FetchedUserData) => {
+            setMyData({
+                ...myData,
+                profile: data.person,
+                points: getPointData(data),
+                searchOptions: []
+            })
+            setUiState({...uiState, hadFetchError: false})
+            setFetchedToggle(!fetchedToggle)
+        })
+        .catch(err => {
+            console.log(err)
+            setUiState({...uiState, hadFetchError: true})
+        })
+        setUiState({...uiState, isFetching: false})
+    }
+
+    // 自動補完用
+    const handleRivalInputChange = (value: string) => {
+        setUiState({...uiState, isSearching: true})
+        searchData(value)
+        .then((options: SearchOption[]) => {
+            setRivalData({...rivalData, searchOptions: options})
+        })
+        .catch(err => {
+            console.log(err)
+        })
+        setUiState({...uiState, isSearching: false})
+    }
+
+    // データ取得用
+    const handleRivalSelect = (value: string) => {
+        setUiState({...uiState, isFetching: true})
+        fetchData(value)
+        .then((data : FetchedUserData) => {
+            setRivalData({
+                ...rivalData,
+                profile: data.person,
+                points: getPointData(data),
+                searchOptions: []
+            })
+            setFetchedToggle(!fetchedToggle)
+            setUiState({...uiState, hadFetchError: false})
+        })
+        .catch(err => {
+            console.log(err)
+            setUiState({...uiState, hadFetchError: true})
+        })
+        setUiState({...uiState, isFetching: false})
     }
 
     return (
-        <div>
-            {
-                radarChartData.length === 0 ? '' : 
-                <MyRadarChart 
-                    userRecords={radarChartData}
-                    myColor={myColor}
-                    rivalColor={rivalColor}
+        <>
+         <p>
+                {uiState.hadFetchError ? 'Error! Something Went Wrong!' : ''}
+            </p>
+            <p>
+                {uiState.isFetching ? 'Data Fetching...' : ''}
+            </p>
+            <Row>
+                <Col span={8}>
+                <p>
+                {myData.profile ? myData.profile.name : ''}
+            </p>
+            <img
+                width={200}
+                height={200}
+                alt="avatar"
+                src={myData.profile ? myData.profile.avatar.url : process.env.REACT_APP_NOUSER_PNG_URL}
                 />
-            }
-            <p>
-                {hadError ? 'Error! Something Went Wrong!' : ''}
+                </Col>
+                <Col span={8}>
+                    {
+                    radarChartData.length === 0 ? '' : 
+                        <MyRadarChart 
+                            userRecords={radarChartData}
+                            myColor={myData.color}
+                            rivalColor={rivalData.color}
+                        />
+                    }
+                </Col>
+                <Col span={8}>
+                <p>
+                {rivalData.profile ? rivalData.profile.name : ''}
             </p>
-            <p>
-                {loading ? 'loading' : ''}
-            </p>
-            <SketchPicker 
+            <img
+                width={200}
+                height={200}
+                alt="avatar"
+                src={rivalData.profile ? rivalData.profile.avatar.url : process.env.REACT_APP_NOUSER_PNG_URL}
+            />
+                </Col>
+            </Row>
+            <Row>
+                <Col span={8}>
+                    <AutoComplete
+                        style={{ width: 300 }}
+                        onSelect={handleMySelect}
+                        onChange={handleMyInputChange}
+                        placeholder="input here"
+                        options={myData.searchOptions}
+                    />
+                </Col>
+                <Col span={8}>
+                </Col>
+                <Col span={8}>
+                <AutoComplete
+                style={{ width: 300 }}
+                onSelect={handleRivalSelect}
+                onChange={handleRivalInputChange}
+                placeholder="input here"
+                options={rivalData.searchOptions}
+            />
+                </Col>
+            </Row>
+            <Row>
+                <Col span={8}>
+                <ChromePicker 
                 onChange={handleMyColorChange}
-                color={myColor[1]}
+                color={myData.color.rgb}
             />
-            <SketchPicker 
-                onChange={handleRivalColorChange}
-                color={rivalColor[1]}
-            />
-            <p>Your WCAID</p>
-            <form onSubmit={handleMySubmit}>
-                <input type="text" onChange={handleMyInputChange} value={myWcaId}/>
-                <button type="submit" disabled={loading}>fetch my data</button>
-            </form>
-            <p>Rivals WCAID</p>
-            <form onSubmit={handleRivalSubmit}>
-                <input type="text" onChange={handleRivalInputChange} value={rivalWcaId}/>
-                <button type="submit" disabled={loading}>fetch rival data</button>
-            </form>
-            <p>
-                {myUserInfo ? myUserInfo.name : ''}
-            </p>
-            <img
-            width={200}
-            height={200}
-            alt="avatar"
-            src={myUserInfo ? myUserInfo.avatar.url : process.env.REACT_APP_NOUSER_PNG_URL}
-            />
-            <p>
-                {rivalUserInfo ? rivalUserInfo.name : ''}
-            </p>
-            <img
-            width={200}
-            height={200}
-            alt="avatar"
-            src={rivalUserInfo ? rivalUserInfo.avatar.url : process.env.REACT_APP_NOUSER_PNG_URL}
-            />
-            <ul>
-                {
-                    searchedIds.map((data, idx) => {
-                        return(
-                            <li key={idx}>
-                                <p>
-                                    {data}
-                                </p>
-                            </li>
-                        )
-                    })
-                }
-            </ul>
-            
-        </div>
+                </Col>
+                <Col span={8}>
+                </Col>
+                <Col span={8}>
+                <ChromePicker 
+                    onChange={handleRivalColorChange}
+                    color={rivalData.color.rgb}
+                />
+                </Col>
+            </Row>
+    
+        </>
     )
 }
 export default Home;
