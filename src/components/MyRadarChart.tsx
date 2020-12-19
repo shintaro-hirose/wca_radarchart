@@ -1,5 +1,5 @@
-import React from "react";
-import { ColorResult } from "react-color";
+import React from 'react'
+import { ColorResult } from 'react-color'
 import {
   Legend,
   PolarAngleAxis,
@@ -8,13 +8,14 @@ import {
   Radar,
   RadarChart,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts'
+import { RadarChartData } from '../containers/Home'
 
 type Props = {
-  userRecords: object[];
-  myColor: ColorResult;
-  rivalColor: ColorResult;
-};
+  userRecords: RadarChartData[]
+  myColor: ColorResult
+  rivalColor: ColorResult
+}
 
 const MyRadarChart: React.FC<Props> = ({
   userRecords,
@@ -49,6 +50,6 @@ const MyRadarChart: React.FC<Props> = ({
         <Legend />
       </RadarChart>
     </ResponsiveContainer>
-  );
-};
-export default MyRadarChart;
+  )
+}
+export default MyRadarChart
