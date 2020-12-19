@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import MyRadarChart from '../components/MyRadarChart'
 import axios from 'axios'
 import { ChromePicker, ColorResult } from 'react-color'
-import { AutoComplete, Col, Row } from 'antd'
+import { AutoComplete, Col, Row, Input, Avatar } from 'antd'
 import { eventInfos } from '../utils/eventInfo'
 import { mbldSolved } from '../utils/decodeMbld'
 import 'antd/dist/antd.css'
@@ -44,53 +44,6 @@ export interface RadarChartData {
   eventName: string
   myPoint: number
   rivalPoint: number
-}
-
-const getPointData = (data: FetchedUserData) => {
-  const points: number[] = []
-  eventInfos.forEach((eventInfo) => {
-    let point = 10
-    if (data.personal_records[eventInfo.eventName] !== undefined) {
-      const value = data.personal_records[eventInfo.eventName].single.best
-      if (eventInfo.eventName === '333mbf') {
-        point = Math.floor(
-          50 +
-            ((mbldSolved(value) - eventInfo.averagePoint) * 50) /
-              (eventInfo.worldPoint - eventInfo.averagePoint)
-        )
-      } else {
-        point = Math.floor(
-          50 +
-            ((eventInfo.averagePoint - value) * 50) /
-              (eventInfo.averagePoint - eventInfo.worldPoint)
-        )
-      }
-    }
-    point = Math.max(point, 10)
-    points.push(point)
-  })
-  return points
-}
-
-const fetchData = async (wcaId: string) => {
-  const url = `${process.env.REACT_APP_API_URL}/persons/${wcaId}`
-  const response = await axios.get(url)
-  return response.data
-}
-
-const searchData = async (searchKey: string) => {
-  const url = `${process.env.REACT_APP_API_URL}/search/users?q=${searchKey}&persons_table=true`
-  const options: SearchOption[] = []
-  await axios.get(url).then((response) => {
-    const results: SearchedUserData[] = response.data.result
-    for (let i = 0; i < results.length && i < 3; i++) {
-      options.push({
-        value: results[i].wca_id,
-        label: `${results[i].name}[${results[i].wca_id}]`,
-      })
-    }
-  })
-  return options
 }
 
 interface SearchOption {
@@ -135,8 +88,6 @@ const Home: React.FC = () => {
   const [fetchedToggle, setFetchedToggle] = useState(false) // useEffect発動するため
 
   useEffect(() => {
-    console.log('useEfect invoked')
-    console.log('rivalData.points.length: ' + rivalData.points.length)
     const newRadarChartData: RadarChartData[] = []
     eventInfos.forEach((eventInfo, idx) => {
       let myPoint = 10
@@ -152,6 +103,44 @@ const Home: React.FC = () => {
     setRadarChartData(newRadarChartData)
   }, [fetchedToggle])
 
+  const getPointData = (data: FetchedUserData) => {
+    const points: number[] = []
+    eventInfos.forEach((eventInfo) => {
+      let point = 10
+      if (data.personal_records[eventInfo.eventName] !== undefined) {
+        const value = data.personal_records[eventInfo.eventName].single.best
+        if (eventInfo.eventName === '333mbf') {
+          point = Math.floor(
+            50 +
+              ((mbldSolved(value) - eventInfo.averagePoint) * 50) /
+                (eventInfo.worldPoint - eventInfo.averagePoint)
+          )
+        } else {
+          point = Math.floor(
+            50 +
+              ((eventInfo.averagePoint - value) * 50) /
+                (eventInfo.averagePoint - eventInfo.worldPoint)
+          )
+        }
+      }
+      point = Math.max(point, 10)
+      points.push(point)
+    })
+    return points
+  }
+
+  const fetchData = async (wcaId: string) => {
+    const url = `${process.env.REACT_APP_API_URL}/persons/${wcaId}`
+    const response = await axios.get(url)
+    return response.data
+  }
+
+  const searchData = async (searchKey: string) => {
+    const url = `${process.env.REACT_APP_API_URL}/search/users?q=${searchKey}&persons_table=true`
+    const response = await axios.get(url)
+    return response.data.result
+  }
+
   const handleMyColorChange = (color: ColorResult) => {
     setMyData({ ...myData, color })
   }
@@ -161,24 +150,28 @@ const Home: React.FC = () => {
   }
 
   // 自動補完用
-  const handleMyInputChange = (value: string) => {
-    if (uiState.isFetching) return
-    console.log('handleMyInputChange invoked')
+  const handleMySearch = (value: string) => {
     setUiState({ ...uiState, isSearching: true })
     searchData(value)
-      .then((options: SearchOption[]) => {
+      .then((results: SearchedUserData[]) => {
+        const options: SearchOption[] = []
+        for (let i = 0; i < results.length && i < 3; i++) {
+          options.push({
+            value: results[i].wca_id,
+            label: `${results[i].name}[${results[i].wca_id}]`,
+          })
+        }
         setMyData({ ...myData, searchOptions: options })
+        setUiState({ ...uiState, isSearching: false })
       })
       .catch((err) => {
         console.log(err)
+        setUiState({ ...uiState, isSearching: false })
       })
-    setUiState({ ...uiState, isSearching: false })
   }
 
   // データ取得用
   const handleMySelect = (value: string) => {
-    if (uiState.isSearching) return
-    console.log('handleMySelect invoked')
     setUiState({ ...uiState, isFetching: true })
     fetchData(value)
       .then((data: FetchedUserData) => {
@@ -188,27 +181,36 @@ const Home: React.FC = () => {
           points: getPointData(data),
           searchOptions: [],
         })
-        setUiState({ ...uiState, hadFetchError: false })
+      })
+      .then(() => {
+        setUiState({ ...uiState, hadFetchError: false, isFetching: false })
         setFetchedToggle(!fetchedToggle)
       })
       .catch((err) => {
         console.log(err)
-        setUiState({ ...uiState, hadFetchError: true })
+        setUiState({ ...uiState, hadFetchError: true, isFetching: false })
       })
-    setUiState({ ...uiState, isFetching: false })
   }
 
   // 自動補完用
-  const handleRivalInputChange = (value: string) => {
+  const handleRivalSearch = (value: string) => {
     setUiState({ ...uiState, isSearching: true })
     searchData(value)
-      .then((options: SearchOption[]) => {
+      .then((results: SearchedUserData[]) => {
+        const options: SearchOption[] = []
+        for (let i = 0; i < results.length && i < 3; i++) {
+          options.push({
+            value: results[i].wca_id,
+            label: `${results[i].name}[${results[i].wca_id}]`,
+          })
+        }
         setRivalData({ ...rivalData, searchOptions: options })
+        setUiState({ ...uiState, isSearching: false })
       })
       .catch((err) => {
         console.log(err)
+        setUiState({ ...uiState, isSearching: false })
       })
-    setUiState({ ...uiState, isSearching: false })
   }
 
   // データ取得用
@@ -222,33 +224,34 @@ const Home: React.FC = () => {
           points: getPointData(data),
           searchOptions: [],
         })
+      })
+      .then(() => {
+        setUiState({ ...uiState, hadFetchError: false, isFetching: false })
         setFetchedToggle(!fetchedToggle)
-        setUiState({ ...uiState, hadFetchError: false })
       })
       .catch((err) => {
         console.log(err)
-        setUiState({ ...uiState, hadFetchError: true })
+        setUiState({ ...uiState, hadFetchError: true, isFetching: false })
       })
-    setUiState({ ...uiState, isFetching: false })
   }
 
   return (
     <>
-      <p>{uiState.hadFetchError ? 'Error! Something Went Wrong!' : ''}</p>
-      <p>{uiState.isFetching ? 'Data Fetching...' : ''}</p>
       <Row>
         <Col span={8}>
-          <p>{myData.profile ? myData.profile.name : ''}</p>
-          <img
-            width={200}
-            height={200}
+          <Avatar
             alt="avatar"
+            className="avatar"
+            size={150}
+            style={{ border: `solid ${myData.color.hex}` }}
             src={
               myData.profile
-                ? myData.profile.avatar.url
+                ? myData.profile.avatar.thumb_url
                 : process.env.REACT_APP_NOUSER_PNG_URL
             }
           />
+          <p>{myData.profile ? myData.profile.name : ''}</p>
+          <p>{myData.profile ? myData.profile.wca_id : ''}</p>
         </Col>
         <Col span={8}>
           {radarChartData.length === 0 ? (
@@ -262,55 +265,61 @@ const Home: React.FC = () => {
           )}
         </Col>
         <Col span={8}>
-          <p>{rivalData.profile ? rivalData.profile.name : ''}</p>
-          <img
-            width={200}
-            height={200}
+          <Avatar
             alt="avatar"
+            size={150}
+            className="avatar"
+            style={{ border: `solid ${rivalData.color.hex}` }}
             src={
               rivalData.profile
-                ? rivalData.profile.avatar.url
+                ? rivalData.profile.avatar.thumb_url
                 : process.env.REACT_APP_NOUSER_PNG_URL
             }
           />
+          <p>{rivalData.profile ? rivalData.profile.name : ''}</p>
+          <p>{rivalData.profile ? rivalData.profile.wca_id : ''}</p>
         </Col>
       </Row>
       <Row>
-        <Col span={8}>
-          <AutoComplete
-            style={{ width: 300 }}
-            onSelect={handleMySelect}
-            onChange={handleMyInputChange}
-            placeholder="input here"
-            options={myData.searchOptions}
-          />
-        </Col>
-        <Col span={8}></Col>
-        <Col span={8}>
-          <AutoComplete
-            style={{ width: 300 }}
-            onSelect={handleRivalSelect}
-            onChange={handleRivalInputChange}
-            placeholder="input here"
-            options={rivalData.searchOptions}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col span={8}>
+        <Col span={12}>
           <ChromePicker
+            className="picker"
             onChange={handleMyColorChange}
             color={myData.color.rgb}
           />
         </Col>
-        <Col span={8}></Col>
-        <Col span={8}>
+        <Col span={12}>
           <ChromePicker
+            className="picker"
             onChange={handleRivalColorChange}
             color={rivalData.color.rgb}
           />
         </Col>
       </Row>
+      <Row>
+        <Col span={12}>
+          <AutoComplete
+            style={{ width: '80%' }}
+            onSearch={handleMySearch}
+            onSelect={handleMySelect}
+            options={myData.searchOptions}
+          >
+            <Input size="large" placeholder="input here" />
+          </AutoComplete>
+        </Col>
+        <Col span={12}>
+          <AutoComplete
+            style={{ width: '80%' }}
+            onSearch={handleRivalSearch}
+            onSelect={handleRivalSelect}
+            options={rivalData.searchOptions}
+          >
+            <Input size="large" placeholder="input here" />
+          </AutoComplete>
+        </Col>
+      </Row>
+      <p>{uiState.hadFetchError ? 'Error! Something Went Wrong!' : ''}</p>
+      <p>{uiState.isFetching ? 'Data Fetching...' : ''}</p>
     </>
   )
 }

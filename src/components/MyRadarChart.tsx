@@ -23,21 +23,16 @@ const MyRadarChart: React.FC<Props> = ({
   rivalColor,
 }) => {
   return (
-    <ResponsiveContainer>
-      <RadarChart data={userRecords}>
+    <ResponsiveContainer width="100%">
+      <RadarChart
+        data={userRecords}
+        // margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+      >
         <PolarGrid />
         <PolarAngleAxis dataKey="eventName" />
         <PolarRadiusAxis
           angle={90 - 360 / userRecords.length}
           domain={[0, 100]}
-        />
-        <Radar
-          name="Rival"
-          dataKey="rivalPoint"
-          stroke={rivalColor.hex}
-          fill={rivalColor.hex}
-          fillOpacity={rivalColor.rgb.a}
-          animationEasing="ease-out"
         />
         <Radar
           name="You"
@@ -47,6 +42,15 @@ const MyRadarChart: React.FC<Props> = ({
           fillOpacity={myColor.rgb.a}
           animationEasing="ease-out"
         />
+        <Radar
+          name="Rival"
+          dataKey="rivalPoint"
+          stroke={rivalColor.hex}
+          fill={rivalColor.hex}
+          fillOpacity={rivalColor.rgb.a}
+          animationEasing="ease-out"
+        />
+
         <Legend />
       </RadarChart>
     </ResponsiveContainer>
