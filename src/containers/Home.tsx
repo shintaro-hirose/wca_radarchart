@@ -123,6 +123,7 @@ const Home: React.FC = () => {
           }
         }
       }
+      point = Number(point.toFixed(2))
       points.push(point)
     })
     return points

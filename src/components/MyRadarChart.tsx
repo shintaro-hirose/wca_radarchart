@@ -8,6 +8,7 @@ import {
   Radar,
   RadarChart,
   ResponsiveContainer,
+  Tooltip,
 } from 'recharts'
 import { RadarChartData } from '../containers/Home'
 
@@ -50,7 +51,7 @@ const MyRadarChart: React.FC<Props> = ({
           fillOpacity={rivalColor.rgb.a}
           animationEasing="ease-out"
         />
-
+        <Tooltip cursor={false} offset={30} />
         <Legend />
       </RadarChart>
     </ResponsiveContainer>
