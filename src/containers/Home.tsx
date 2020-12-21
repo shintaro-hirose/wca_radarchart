@@ -4,7 +4,7 @@ import axios from 'axios'
 import { ChromePicker, ColorResult } from 'react-color'
 import { AutoComplete, Col, Row, Input, Avatar } from 'antd'
 import { eventInfos } from '../utils/eventInfo'
-import { mbldSolved } from '../utils/decodeMbld'
+import { mbldPoint } from '../utils/decodeMbld'
 import 'antd/dist/antd.css'
 
 interface ResultDetail {
@@ -110,20 +110,19 @@ const Home: React.FC = () => {
       if (data.personal_records[eventInfo.eventName] !== undefined) {
         const value = data.personal_records[eventInfo.eventName].single.best
         if (eventInfo.eventName === '333mbf') {
-          point = Math.floor(
-            50 +
-              ((mbldSolved(value) - eventInfo.averagePoint) * 50) /
-                (eventInfo.worldPoint - eventInfo.averagePoint)
-          )
+          if (mbldPoint(value) > eventInfo.averagePoint) {
+            point = 50 + (50 * mbldPoint(value)) / eventInfo.worldPoint
+          } else {
+            point = 10 + (40 * mbldPoint(value)) / eventInfo.averagePoint
+          }
         } else {
-          point = Math.floor(
-            50 +
-              ((eventInfo.averagePoint - value) * 50) /
-                (eventInfo.averagePoint - eventInfo.worldPoint)
-          )
+          if (value < eventInfo.averagePoint) {
+            point = 50 + (50 * eventInfo.worldPoint) / value
+          } else {
+            point = 10 + (40 * eventInfo.averagePoint) / value
+          }
         }
       }
-      point = Math.max(point, 10)
       points.push(point)
     })
     return points

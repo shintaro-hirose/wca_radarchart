@@ -1,4 +1,4 @@
-import { mbldSolved } from './decodeMbld'
+import { mbldPoint } from './decodeMbld'
 
 interface EventInfo {
   eventName: string
@@ -7,8 +7,8 @@ interface EventInfo {
 }
 
 export const eventInfos: EventInfo[] = [
-  { eventName: '333', worldPoint: 347, averagePoint: 2000 },
-  { eventName: '222', worldPoint: 49, averagePoint: 750 },
+  { eventName: '333', worldPoint: 347, averagePoint: 2500 },
+  { eventName: '222', worldPoint: 49, averagePoint: 800 },
   { eventName: '444', worldPoint: 1742, averagePoint: 8000 },
   { eventName: '555', worldPoint: 3492, averagePoint: 14000 },
   { eventName: '666', worldPoint: 6951, averagePoint: 24000 },
@@ -23,5 +23,5 @@ export const eventInfos: EventInfo[] = [
   { eventName: '333bf', worldPoint: 1550, averagePoint: 10000 },
   { eventName: '444bf', worldPoint: 6251, averagePoint: 90000 },
   { eventName: '555bf', worldPoint: 14162, averagePoint: 150000 },
-  { eventName: '333mbf', worldPoint: mbldSolved(410358601), averagePoint: 3 },
+  { eventName: '333mbf', worldPoint: mbldPoint(410358601), averagePoint: 5 },
 ]
