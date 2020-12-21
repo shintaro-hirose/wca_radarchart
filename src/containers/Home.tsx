@@ -85,7 +85,7 @@ const Home: React.FC = () => {
     },
     searchOptions: [],
   })
-  const [fetchedToggle, setFetchedToggle] = useState(false) // useEffect発動するため
+  // const [fetchedToggle, setFetchedToggle] = useState(false) // useEffect発動するため
 
   useEffect(() => {
     const newRadarChartData: RadarChartData[] = []
@@ -101,7 +101,7 @@ const Home: React.FC = () => {
       })
     })
     setRadarChartData(newRadarChartData)
-  }, [fetchedToggle])
+  }, [myData.points, rivalData.points])
 
   const getPointData = (data: FetchedUserData) => {
     const points: number[] = []
@@ -183,7 +183,6 @@ const Home: React.FC = () => {
       })
       .then(() => {
         setUiState({ ...uiState, hadFetchError: false, isFetching: false })
-        setFetchedToggle(!fetchedToggle)
       })
       .catch((err) => {
         console.log(err)
@@ -226,7 +225,6 @@ const Home: React.FC = () => {
       })
       .then(() => {
         setUiState({ ...uiState, hadFetchError: false, isFetching: false })
-        setFetchedToggle(!fetchedToggle)
       })
       .catch((err) => {
         console.log(err)
