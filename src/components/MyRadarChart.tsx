@@ -23,7 +23,7 @@ const MyRadarChart: React.FC<Props> = ({
   rivalColor,
 }) => {
   return (
-    <ResponsiveContainer width="100%">
+    <ResponsiveContainer height={300}>
       <RadarChart
         data={userRecords}
         // margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
@@ -37,16 +37,16 @@ const MyRadarChart: React.FC<Props> = ({
         <Radar
           name="You"
           dataKey="myPoint"
-          stroke={myColor.hex}
-          fill={myColor.hex}
+          stroke={`rgb(${myColor.rgb.r}, ${myColor.rgb.g}, ${myColor.rgb.b})`}
+          fill={`rgb(${myColor.rgb.r}, ${myColor.rgb.g}, ${myColor.rgb.b})`}
           fillOpacity={myColor.rgb.a}
           animationEasing="ease-out"
         />
         <Radar
           name="Rival"
           dataKey="rivalPoint"
-          stroke={rivalColor.hex}
-          fill={rivalColor.hex}
+          stroke={`rgb(${rivalColor.rgb.r}, ${rivalColor.rgb.g}, ${rivalColor.rgb.b})`}
+          fill={`rgb(${rivalColor.rgb.r}, ${rivalColor.rgb.g}, ${rivalColor.rgb.b})`}
           fillOpacity={rivalColor.rgb.a}
           animationEasing="ease-out"
         />

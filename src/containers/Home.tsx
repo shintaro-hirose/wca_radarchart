@@ -69,8 +69,8 @@ const Home: React.FC = () => {
     profile: null,
     points: [],
     color: {
-      hex: 'red',
-      rgb: { r: 255, g: 10, b: 10, a: 0.5 },
+      hex: '',
+      rgb: { r: 10, g: 63, b: 255, a: 0.8 },
       hsl: { h: 0, s: 0, l: 0 },
     },
     searchOptions: [],
@@ -79,8 +79,8 @@ const Home: React.FC = () => {
     profile: null,
     points: [],
     color: {
-      hex: 'green',
-      rgb: { r: 10, g: 255, b: 10, a: 0.5 },
+      hex: '',
+      rgb: { r: 255, g: 10, b: 161, a: 0.4 },
       hsl: { h: 0, s: 0, l: 0 },
     },
     searchOptions: [],
@@ -243,7 +243,9 @@ const Home: React.FC = () => {
             alt="avatar"
             className="avatar"
             size={150}
-            style={{ border: `solid ${myData.color.hex}` }}
+            style={{
+              border: `solid rgb(${myData.color.rgb.r}, ${myData.color.rgb.g}, ${myData.color.rgb.b})`,
+            }}
             src={
               myData.profile
                 ? myData.profile.avatar.thumb_url
@@ -269,7 +271,9 @@ const Home: React.FC = () => {
             alt="avatar"
             size={150}
             className="avatar"
-            style={{ border: `solid ${rivalData.color.hex}` }}
+            style={{
+              border: `solid rgb(${rivalData.color.rgb.r}, ${rivalData.color.rgb.g}, ${rivalData.color.rgb.b})`,
+            }}
             src={
               rivalData.profile
                 ? rivalData.profile.avatar.thumb_url
