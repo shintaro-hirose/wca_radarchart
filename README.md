@@ -1,3 +1,3 @@
 # Developing ...
 
-![demo](https://user-images.githubusercontent.com/48212107/102900135-3be8a500-44af-11eb-89db-e9ea65069019.mov)
+<img width="576" alt="スクリーンショット 2020-12-22 23 47 23" src="https://user-images.githubusercontent.com/48212107/102900764-1d36de00-44b0-11eb-9a34-dd7f932e17a7.png">
