@@ -111,13 +111,19 @@ const Home: React.FC = () => {
         const value = data.personal_records[eventInfo.eventName].single.best
         if (eventInfo.eventName === '333mbf') {
           if (mbldPoint(value) > eventInfo.averagePoint) {
-            point = 50 + (50 * mbldPoint(value)) / eventInfo.worldPoint
+            point =
+              50 +
+              (50 * (mbldPoint(value) - eventInfo.averagePoint)) /
+                (eventInfo.worldPoint - eventInfo.averagePoint)
           } else {
             point = 10 + (40 * mbldPoint(value)) / eventInfo.averagePoint
           }
         } else {
           if (value < eventInfo.averagePoint) {
-            point = 50 + (50 * eventInfo.worldPoint) / value
+            point =
+              50 +
+              (50 * (eventInfo.averagePoint - value)) /
+                (eventInfo.averagePoint - eventInfo.worldPoint)
           } else {
             point = 10 + (40 * eventInfo.averagePoint) / value
           }
