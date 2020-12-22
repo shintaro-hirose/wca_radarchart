@@ -38,17 +38,17 @@ const MyRadarChart: React.FC<Props> = ({
         <Radar
           name="You"
           dataKey="myPoint"
-          stroke={`rgb(${myColor.rgb.r}, ${myColor.rgb.g}, ${myColor.rgb.b})`}
-          fill={`rgb(${myColor.rgb.r}, ${myColor.rgb.g}, ${myColor.rgb.b})`}
-          fillOpacity={myColor.rgb.a}
+          stroke={myColor.hex}
+          fill={myColor.hex}
+          fillOpacity={0.8}
           animationEasing="ease-out"
         />
         <Radar
           name="Rival"
           dataKey="rivalPoint"
-          stroke={`rgb(${rivalColor.rgb.r}, ${rivalColor.rgb.g}, ${rivalColor.rgb.b})`}
-          fill={`rgb(${rivalColor.rgb.r}, ${rivalColor.rgb.g}, ${rivalColor.rgb.b})`}
-          fillOpacity={rivalColor.rgb.a}
+          stroke={rivalColor.hex}
+          fill={rivalColor.hex}
+          fillOpacity={0.4}
           animationEasing="ease-out"
         />
         <Tooltip cursor={false} offset={30} />

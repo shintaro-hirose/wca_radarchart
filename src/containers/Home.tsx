@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import MyRadarChart from '../components/MyRadarChart'
 import axios from 'axios'
-import { ChromePicker, ColorResult } from 'react-color'
+import { TwitterPicker, ColorResult } from 'react-color'
 import { AutoComplete, Col, Row, Input, Avatar } from 'antd'
 import { eventInfos } from '../utils/eventInfo'
 import { mbldPoint } from '../utils/decodeMbld'
@@ -69,8 +69,8 @@ const Home: React.FC = () => {
     profile: null,
     points: [],
     color: {
-      hex: '',
-      rgb: { r: 10, g: 63, b: 255, a: 0.8 },
+      hex: '#8ED1FC',
+      rgb: { r: 0, g: 0, b: 0, a: 0 },
       hsl: { h: 0, s: 0, l: 0 },
     },
     searchOptions: [],
@@ -79,8 +79,8 @@ const Home: React.FC = () => {
     profile: null,
     points: [],
     color: {
-      hex: '',
-      rgb: { r: 255, g: 10, b: 161, a: 0.4 },
+      hex: '#F78DA7',
+      rgb: { r: 0, g: 0, b: 0, a: 0 },
       hsl: { h: 0, s: 0, l: 0 },
     },
     searchOptions: [],
@@ -248,7 +248,7 @@ const Home: React.FC = () => {
             className="avatar"
             size={150}
             style={{
-              border: `solid rgb(${myData.color.rgb.r}, ${myData.color.rgb.g}, ${myData.color.rgb.b})`,
+              border: `solid ${myData.color.hex}`,
             }}
             src={
               myData.profile
@@ -276,7 +276,7 @@ const Home: React.FC = () => {
             size={150}
             className="avatar"
             style={{
-              border: `solid rgb(${rivalData.color.rgb.r}, ${rivalData.color.rgb.g}, ${rivalData.color.rgb.b})`,
+              border: `solid ${rivalData.color.hex}`,
             }}
             src={
               rivalData.profile
@@ -290,17 +290,19 @@ const Home: React.FC = () => {
       </Row>
       <Row>
         <Col span={12}>
-          <ChromePicker
+          <TwitterPicker
             className="picker"
             onChange={handleMyColorChange}
-            color={myData.color.rgb}
+            color={myData.color.hex}
+            triangle="hide"
           />
         </Col>
         <Col span={12}>
-          <ChromePicker
+          <TwitterPicker
             className="picker"
             onChange={handleRivalColorChange}
-            color={rivalData.color.rgb}
+            color={rivalData.color.hex}
+            triangle="hide"
           />
         </Col>
       </Row>
@@ -311,8 +313,10 @@ const Home: React.FC = () => {
             onSearch={handleMySearch}
             onSelect={handleMySelect}
             options={myData.searchOptions}
+            disabled={uiState.isFetching}
+            defaultValue={''}
           >
-            <Input size="large" placeholder="input here" />
+            <Input size="large" placeholder="name or wca_id" />
           </AutoComplete>
         </Col>
         <Col span={12}>
@@ -321,13 +325,16 @@ const Home: React.FC = () => {
             onSearch={handleRivalSearch}
             onSelect={handleRivalSelect}
             options={rivalData.searchOptions}
+            disabled={uiState.isFetching}
+            defaultValue={''}
           >
-            <Input size="large" placeholder="input here" />
+            <Input size="large" placeholder="name or wca_id" />
           </AutoComplete>
         </Col>
       </Row>
       <p>{uiState.hadFetchError ? 'Error! Something Went Wrong!' : ''}</p>
       <p>{uiState.isFetching ? 'Data Fetching...' : ''}</p>
+      <p>{uiState.isSearching ? 'Data Searching...' : ''}</p>
     </>
   )
 }
