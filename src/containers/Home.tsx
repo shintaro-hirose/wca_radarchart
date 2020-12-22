@@ -309,7 +309,7 @@ const Home: React.FC = () => {
       <Row>
         <Col span={12}>
           <AutoComplete
-            style={{ width: '80%' }}
+            style={{ width: '276px' }}
             onSearch={handleMySearch}
             onSelect={handleMySelect}
             options={myData.searchOptions}
@@ -321,7 +321,7 @@ const Home: React.FC = () => {
         </Col>
         <Col span={12}>
           <AutoComplete
-            style={{ width: '80%' }}
+            style={{ width: '276px' }}
             onSearch={handleRivalSearch}
             onSelect={handleRivalSelect}
             options={rivalData.searchOptions}
