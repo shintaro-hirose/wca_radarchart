@@ -24,10 +24,10 @@ const MyRadarChart: React.FC<Props> = ({
   rivalColor,
 }) => {
   return (
-    <ResponsiveContainer height={300}>
+    <ResponsiveContainer height={400}>
       <RadarChart
         data={userRecords}
-        // margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+        margin={{ top: 0, right: 30, bottom: 0, left: 30 }}
       >
         <PolarGrid />
         <PolarAngleAxis dataKey="eventName" />

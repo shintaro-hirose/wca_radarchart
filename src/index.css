@@ -12,10 +12,18 @@ body {
   text-align: center;
 }
 
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
 .picker {
   margin: auto;
 }
 
-/* .avatar {
-  float: left;
-} */
+.navbar {
+  height: 50px;
+  background-color: #dfdfdf;
+  color: aliceblue;
+}

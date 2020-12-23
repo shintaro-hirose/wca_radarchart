@@ -242,11 +242,11 @@ const Home: React.FC = () => {
   return (
     <>
       <Row>
-        <Col span={8}>
+        <Col span={4}>
           <Avatar
             alt="avatar"
             className="avatar"
-            size={150}
+            size={100}
             style={{
               border: `solid ${myData.color.hex}`,
             }}
@@ -259,7 +259,7 @@ const Home: React.FC = () => {
           <p>{myData.profile ? myData.profile.name : ''}</p>
           <p>{myData.profile ? myData.profile.wca_id : ''}</p>
         </Col>
-        <Col span={8}>
+        <Col span={16}>
           {radarChartData.length === 0 ? (
             ''
           ) : (
@@ -270,10 +270,10 @@ const Home: React.FC = () => {
             />
           )}
         </Col>
-        <Col span={8}>
+        <Col span={4}>
           <Avatar
             alt="avatar"
-            size={150}
+            size={100}
             className="avatar"
             style={{
               border: `solid ${rivalData.color.hex}`,
