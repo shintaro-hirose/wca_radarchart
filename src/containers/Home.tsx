@@ -243,19 +243,26 @@ const Home: React.FC = () => {
     <>
       <Row justify="space-around" align="middle">
         <Col span={4}>
-          <Avatar
-            alt="avatar"
-            className="avatar"
-            size={100}
-            style={{
-              border: `solid ${myData.color.hex}`,
-            }}
-            src={
-              myData.profile
-                ? myData.profile.avatar.thumb_url
-                : process.env.REACT_APP_NOUSER_PNG_URL
-            }
-          />
+          <a
+            href={myData.profile ? myData.profile.url : '#'}
+            target={myData.profile ? '_blank' : ''}
+            rel="noreferrer"
+          >
+            <Avatar
+              alt="avatar"
+              className="avatar"
+              size={100}
+              style={{
+                border: `solid ${myData.color.hex}`,
+              }}
+              src={
+                myData.profile
+                  ? myData.profile.avatar.thumb_url
+                  : process.env.REACT_APP_NOUSER_PNG_URL
+              }
+            />
+          </a>
+
           <p>{myData.profile ? myData.profile.name : ''}</p>
           <p>{myData.profile ? myData.profile.wca_id : ''}</p>
         </Col>
@@ -271,19 +278,25 @@ const Home: React.FC = () => {
           )}
         </Col>
         <Col span={4}>
-          <Avatar
-            alt="avatar"
-            size={100}
-            className="avatar"
-            style={{
-              border: `solid ${rivalData.color.hex}`,
-            }}
-            src={
-              rivalData.profile
-                ? rivalData.profile.avatar.thumb_url
-                : process.env.REACT_APP_NOUSER_PNG_URL
-            }
-          />
+          <a
+            href={myData.profile ? myData.profile.url : '#'}
+            target={myData.profile ? '_blank' : ''}
+            rel="noreferrer"
+          >
+            <Avatar
+              alt="avatar"
+              size={100}
+              className="avatar"
+              style={{
+                border: `solid ${rivalData.color.hex}`,
+              }}
+              src={
+                rivalData.profile
+                  ? rivalData.profile.avatar.thumb_url
+                  : process.env.REACT_APP_NOUSER_PNG_URL
+              }
+            />
+          </a>
           <p>{rivalData.profile ? rivalData.profile.name : ''}</p>
           <p>{rivalData.profile ? rivalData.profile.wca_id : ''}</p>
         </Col>
