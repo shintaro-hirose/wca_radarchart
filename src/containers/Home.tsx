@@ -241,7 +241,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <Row>
+      <Row justify="space-around" align="middle">
         <Col span={4}>
           <Avatar
             alt="avatar"
@@ -288,26 +288,14 @@ const Home: React.FC = () => {
           <p>{rivalData.profile ? rivalData.profile.wca_id : ''}</p>
         </Col>
       </Row>
-      <Row>
-        <Col span={12}>
+      <Row className="inputs" gutter={[150, 0]}>
+        <Col sm={24} md={12}>
           <TwitterPicker
             className="picker"
             onChange={handleMyColorChange}
             color={myData.color.hex}
             triangle="hide"
           />
-        </Col>
-        <Col span={12}>
-          <TwitterPicker
-            className="picker"
-            onChange={handleRivalColorChange}
-            color={rivalData.color.hex}
-            triangle="hide"
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col span={12}>
           <AutoComplete
             style={{ width: '276px' }}
             onSearch={handleMySearch}
@@ -319,7 +307,13 @@ const Home: React.FC = () => {
             <Input size="large" placeholder="name or wca_id" />
           </AutoComplete>
         </Col>
-        <Col span={12}>
+        <Col sm={24} md={12}>
+          <TwitterPicker
+            className="picker"
+            onChange={handleRivalColorChange}
+            color={rivalData.color.hex}
+            triangle="hide"
+          />
           <AutoComplete
             style={{ width: '276px' }}
             onSearch={handleRivalSearch}

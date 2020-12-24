@@ -24,6 +24,10 @@ body {
 
 .navbar {
   height: 50px;
-  background-color: #dfdfdf;
-  color: aliceblue;
+  background-color: rgb(10, 161, 141);
+  padding: 10px;
+}
+
+.inputs {
+  margin-top: 40px;
 }
