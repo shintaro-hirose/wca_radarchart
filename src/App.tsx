@@ -9,6 +9,7 @@ const App: React.FC = () => {
       <div className="container">
         <Home />
       </div>
+      <footer>© 2020 Shintaro Hirose</footer>
     </div>
   )
 }

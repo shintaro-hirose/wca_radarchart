@@ -8,8 +8,10 @@ body {
 }
 
 .App {
-  margin: 0 auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .container {
@@ -24,10 +26,18 @@ body {
 
 .navbar {
   height: 50px;
-  background-color: dimgrey;
+  background-color: rgb(8, 14, 73);
   padding: 10px;
 }
 
 .inputs {
   margin-top: 40px;
+}
+
+footer {
+  background-color: rgb(8, 14, 73);
+  height: 50px;
+  padding: 15px;
+  color: white;
+  margin-top: auto;
 }
