@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react'
 import MyRadarChart from '../components/MyRadarChart'
 import axios from 'axios'
 import { TwitterPicker, ColorResult } from 'react-color'
-import { AutoComplete, Col, Row, Input, Avatar, Tooltip } from 'antd'
+import { AutoComplete, Col, Row, Input, Avatar, Tooltip, Button } from 'antd'
 import { eventInfos } from '../utils/eventInfo'
 import { mbldPoint } from '../utils/decodeMbld'
 import 'antd/dist/antd.css'
+import { InfoModal } from '../components/InfoModal'
 
 interface ResultDetail {
   best: number
@@ -354,6 +355,7 @@ const Home: React.FC = () => {
           </AutoComplete>
         </Col>
       </Row>
+
       <p>{uiState.hadFetchError ? 'Error! Something Went Wrong!' : ''}</p>
       <p>{uiState.isFetching ? 'Data Fetching...' : ''}</p>
       <p>{uiState.isSearching ? 'Data Searching...' : ''}</p>
