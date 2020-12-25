@@ -24,7 +24,7 @@ const MyRadarChart: React.FC<Props> = ({
   rivalColor,
 }) => {
   return (
-    <ResponsiveContainer height={400}>
+    <ResponsiveContainer width="100%" height={400}>
       <RadarChart
         data={userRecords}
         margin={{ top: 0, right: 30, bottom: 0, left: 30 }}

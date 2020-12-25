@@ -241,8 +241,12 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <Row justify="space-around" align="middle">
-        <Col span={4}>
+      <Row align="top">
+        <Col
+          xs={{ span: 12, order: 1 }}
+          sm={{ span: 12, order: 1 }}
+          md={{ span: 4, order: 1 }}
+        >
           <a
             href={myData.profile ? myData.profile.url : '#'}
             target={myData.profile ? '_blank' : ''}
@@ -266,7 +270,11 @@ const Home: React.FC = () => {
           <p>{myData.profile ? myData.profile.name : ''}</p>
           <p>{myData.profile ? myData.profile.wca_id : ''}</p>
         </Col>
-        <Col span={16}>
+        <Col
+          xs={{ span: 24, order: 3 }}
+          sm={{ span: 24, order: 3 }}
+          md={{ span: 16, order: 2 }}
+        >
           {radarChartData.length === 0 ? (
             ''
           ) : (
@@ -277,7 +285,11 @@ const Home: React.FC = () => {
             />
           )}
         </Col>
-        <Col span={4}>
+        <Col
+          xs={{ span: 12, order: 2 }}
+          sm={{ span: 12, order: 2 }}
+          md={{ span: 4, order: 3 }}
+        >
           <a
             href={myData.profile ? myData.profile.url : '#'}
             target={myData.profile ? '_blank' : ''}
@@ -301,8 +313,8 @@ const Home: React.FC = () => {
           <p>{rivalData.profile ? rivalData.profile.wca_id : ''}</p>
         </Col>
       </Row>
-      <Row className="inputs" gutter={[150, 0]}>
-        <Col sm={24} md={12}>
+      <Row className="inputs" justify="space-around" align="middle">
+        <Col xs={24} sm={24} md={12}>
           <TwitterPicker
             className="picker"
             onChange={handleMyColorChange}
@@ -320,7 +332,7 @@ const Home: React.FC = () => {
             <Input size="large" placeholder="name or wca_id" />
           </AutoComplete>
         </Col>
-        <Col sm={24} md={12}>
+        <Col xs={24} sm={24} md={12}>
           <TwitterPicker
             className="picker"
             onChange={handleRivalColorChange}
