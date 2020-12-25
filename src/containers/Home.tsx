@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import MyRadarChart from '../components/MyRadarChart'
 import axios from 'axios'
 import { TwitterPicker, ColorResult } from 'react-color'
-import { AutoComplete, Col, Row, Input, Avatar } from 'antd'
+import { AutoComplete, Col, Row, Input, Avatar, Tooltip } from 'antd'
 import { eventInfos } from '../utils/eventInfo'
 import { mbldPoint } from '../utils/decodeMbld'
 import 'antd/dist/antd.css'
@@ -247,26 +247,27 @@ const Home: React.FC = () => {
           sm={{ span: 12, order: 1 }}
           md={{ span: 4, order: 1 }}
         >
-          <a
-            href={myData.profile ? myData.profile.url : '#'}
-            target={myData.profile ? '_blank' : ''}
-            rel="noreferrer"
-          >
-            <Avatar
-              alt="avatar"
-              className="avatar"
-              size={100}
-              style={{
-                border: `solid ${myData.color.hex}`,
-              }}
-              src={
-                myData.profile
-                  ? myData.profile.avatar.thumb_url
-                  : process.env.REACT_APP_NOUSER_PNG_URL
-              }
-            />
-          </a>
-
+          <Tooltip title="Jump to users page" color={myData.color.hex}>
+            <a
+              href={myData.profile ? myData.profile.url : '#'}
+              target={myData.profile ? '_blank' : ''}
+              rel="noreferrer"
+            >
+              <Avatar
+                alt="avatar"
+                className="avatar"
+                size={100}
+                style={{
+                  border: `solid ${myData.color.hex}`,
+                }}
+                src={
+                  myData.profile
+                    ? myData.profile.avatar.thumb_url
+                    : process.env.REACT_APP_NOUSER_PNG_URL
+                }
+              />
+            </a>
+          </Tooltip>
           <p>{myData.profile ? myData.profile.name : ''}</p>
           <p>{myData.profile ? myData.profile.wca_id : ''}</p>
         </Col>
@@ -290,25 +291,27 @@ const Home: React.FC = () => {
           sm={{ span: 12, order: 2 }}
           md={{ span: 4, order: 3 }}
         >
-          <a
-            href={myData.profile ? myData.profile.url : '#'}
-            target={myData.profile ? '_blank' : ''}
-            rel="noreferrer"
-          >
-            <Avatar
-              alt="avatar"
-              size={100}
-              className="avatar"
-              style={{
-                border: `solid ${rivalData.color.hex}`,
-              }}
-              src={
-                rivalData.profile
-                  ? rivalData.profile.avatar.thumb_url
-                  : process.env.REACT_APP_NOUSER_PNG_URL
-              }
-            />
-          </a>
+          <Tooltip title="Jump to users page" color={rivalData.color.hex}>
+            <a
+              href={myData.profile ? myData.profile.url : '#'}
+              target={myData.profile ? '_blank' : ''}
+              rel="noreferrer"
+            >
+              <Avatar
+                alt="avatar"
+                size={100}
+                className="avatar"
+                style={{
+                  border: `solid ${rivalData.color.hex}`,
+                }}
+                src={
+                  rivalData.profile
+                    ? rivalData.profile.avatar.thumb_url
+                    : process.env.REACT_APP_NOUSER_PNG_URL
+                }
+              />
+            </a>
+          </Tooltip>
           <p>{rivalData.profile ? rivalData.profile.name : ''}</p>
           <p>{rivalData.profile ? rivalData.profile.wca_id : ''}</p>
         </Col>
@@ -329,7 +332,7 @@ const Home: React.FC = () => {
             disabled={uiState.isFetching}
             defaultValue={''}
           >
-            <Input size="large" placeholder="name or wca_id" />
+            <Input size="large" placeholder="input your name or wca_id" />
           </AutoComplete>
         </Col>
         <Col xs={24} sm={24} md={12}>
@@ -347,7 +350,7 @@ const Home: React.FC = () => {
             disabled={uiState.isFetching}
             defaultValue={''}
           >
-            <Input size="large" placeholder="name or wca_id" />
+            <Input size="large" placeholder="input rivals name or wca_id" />
           </AutoComplete>
         </Col>
       </Row>
