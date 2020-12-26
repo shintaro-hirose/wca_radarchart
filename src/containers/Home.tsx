@@ -6,7 +6,7 @@ import { AutoComplete, Col, Row, Input, Avatar, Tooltip, Button } from 'antd'
 import { eventInfos } from '../utils/eventInfo'
 import { mbldPoint } from '../utils/decodeMbld'
 import 'antd/dist/antd.css'
-import { InfoModal } from '../components/InfoModal'
+import { Description } from '../components/Description'
 
 interface ResultDetail {
   best: number
@@ -355,10 +355,7 @@ const Home: React.FC = () => {
           </AutoComplete>
         </Col>
       </Row>
-
-      <p>{uiState.hadFetchError ? 'Error! Something Went Wrong!' : ''}</p>
-      <p>{uiState.isFetching ? 'Data Fetching...' : ''}</p>
-      <p>{uiState.isSearching ? 'Data Searching...' : ''}</p>
+      <Description />
     </>
   )
 }

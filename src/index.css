@@ -16,6 +16,7 @@ body {
 
 .container {
   max-width: 800px;
+  width: 100%;
   margin: 0 auto;
   padding: 20px;
 }
@@ -46,4 +47,14 @@ footer {
   position: fixed;
   bottom: 40px;
   right: 40px;
+}
+
+.description {
+  text-align: left;
+  max-width: 500px;
+  margin: 150px auto 0px auto;
+}
+
+.icons {
+  text-align: center;
 }
