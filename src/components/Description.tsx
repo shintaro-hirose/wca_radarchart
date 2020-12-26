@@ -17,6 +17,17 @@ export const Description: React.FC = () => {
         <li>AVG: assumed average time(or score) to get 50 points</li>
         <li>PB: personal best time(or score)</li>
       </ul>
+      <p>
+        Check{' '}
+        <a
+          href="https://github.com/shintaro-hirose/wca_radarchart/blob/master/src/utils/eventInfo.ts"
+          rel="noreferrer"
+          target="_blank"
+        >
+          here
+        </a>{' '}
+        for the fixed AVG time and score.
+      </p>
       <p>If your time is better than AVG, you get score</p>
       <ul>
         <li>
@@ -50,7 +61,7 @@ export const Description: React.FC = () => {
       <br />
       <h1>Contact</h1>
       <p>
-        You have any fun idea or suggestion? Then contact me at{' '}
+        You have any fun idea or suggestion? Then contact me on{' '}
         <a
           href="https://github.com/shintaro-hirose/wca_radarchart"
           rel="noreferrer"
