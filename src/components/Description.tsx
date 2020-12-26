@@ -83,7 +83,7 @@ export const Description: React.FC = () => {
           <GithubOutlined />
         </Button>
         <Button
-          href="https://twitter.com/home"
+          href="https://twitter.com/cubeforworld"
           rel="noreferrer"
           target="_blank"
           shape="circle"
