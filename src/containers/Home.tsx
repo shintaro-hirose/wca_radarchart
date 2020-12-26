@@ -294,8 +294,8 @@ const Home: React.FC = () => {
         >
           <Tooltip title="Jump to users page" color={rivalData.color.hex}>
             <a
-              href={myData.profile ? myData.profile.url : '#'}
-              target={myData.profile ? '_blank' : ''}
+              href={rivalData.profile ? rivalData.profile.url : '#'}
+              target={rivalData.profile ? '_blank' : ''}
               rel="noreferrer"
             >
               <Avatar
