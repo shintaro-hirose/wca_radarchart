@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts'
-import { RadarChartData } from '../containers/Home'
+import { RadarChartData } from '../interfaces/interfaces'
 
 type Props = {
   userRecords: RadarChartData[]
@@ -18,7 +18,7 @@ type Props = {
   rivalColor: ColorResult
 }
 
-const MyRadarChart: React.FC<Props> = ({
+export const CustomRadarChart: React.FC<Props> = ({
   userRecords,
   myColor,
   rivalColor,
@@ -57,4 +57,3 @@ const MyRadarChart: React.FC<Props> = ({
     </ResponsiveContainer>
   )
 }
-export default MyRadarChart

@@ -1,63 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import MyRadarChart from '../components/MyRadarChart'
+import { CustomRadarChart } from '../components/CustomRadarChart'
 import axios from 'axios'
 import { TwitterPicker, ColorResult } from 'react-color'
-import { AutoComplete, Col, Row, Input, Avatar, Tooltip } from 'antd'
+import { AutoComplete, Col, Row, Input } from 'antd'
 import { eventInfos } from '../utils/eventInfo'
 import { mbldPoint } from '../utils/decodeMbld'
 import 'antd/dist/antd.css'
 import { Description } from '../components/Description'
-
-interface ResultDetail {
-  best: number
-  world_rank: number
-  continent_rank: number
-  country_rank: number
-}
-
-interface Profile {
-  wca_id: string
-  name: string
-  url: string
-  avatar: {
-    url: string
-    thumb_url: string
-    is_default: boolean
-  }
-}
-
-interface FetchedUserData {
-  person: Profile
-  personal_records: {
-    [param: string]: {
-      single: ResultDetail
-      average?: ResultDetail
-    }
-  }
-}
-
-interface SearchedUserData {
-  name: string
-  wca_id: string
-}
-
-export interface RadarChartData {
-  eventName: string
-  myPoint: number
-  rivalPoint: number
-}
-
-interface SearchOption {
-  label: string
-  value: string
-}
-
-interface UserData {
-  profile: Profile | null
-  points: number[]
-  color: ColorResult
-  searchOptions: SearchOption[]
-}
+import { UserProfileBlock } from '../components/UserProfileBlock'
+import {
+  RadarChartData,
+  UserData,
+  FetchedUserData,
+  SearchedUserData,
+  SearchOption,
+} from '../interfaces/interfaces'
 
 const Home: React.FC = () => {
   const [radarChartData, setRadarChartData] = useState<RadarChartData[]>([])
@@ -86,7 +43,6 @@ const Home: React.FC = () => {
     },
     searchOptions: [],
   })
-  // const [fetchedToggle, setFetchedToggle] = useState(false) // useEffect発動するため
 
   useEffect(() => {
     const newRadarChartData: RadarChartData[] = []
@@ -248,29 +204,7 @@ const Home: React.FC = () => {
           sm={{ span: 12, order: 1 }}
           md={{ span: 4, order: 1 }}
         >
-          <Tooltip title="Jump to users page" color={myData.color.hex}>
-            <a
-              href={myData.profile ? myData.profile.url : '#'}
-              target={myData.profile ? '_blank' : ''}
-              rel="noreferrer"
-            >
-              <Avatar
-                alt="avatar"
-                className="avatar"
-                size={100}
-                style={{
-                  border: `solid ${myData.color.hex}`,
-                }}
-                src={
-                  myData.profile
-                    ? myData.profile.avatar.thumb_url
-                    : process.env.REACT_APP_NOUSER_PNG_URL
-                }
-              />
-            </a>
-          </Tooltip>
-          <p>{myData.profile ? myData.profile.name : ''}</p>
-          <p>{myData.profile ? myData.profile.wca_id : ''}</p>
+          <UserProfileBlock userdata={myData} />
         </Col>
         <Col
           xs={{ span: 24, order: 3 }}
@@ -280,7 +214,7 @@ const Home: React.FC = () => {
           {radarChartData.length === 0 ? (
             ''
           ) : (
-            <MyRadarChart
+            <CustomRadarChart
               userRecords={radarChartData}
               myColor={myData.color}
               rivalColor={rivalData.color}
@@ -292,29 +226,7 @@ const Home: React.FC = () => {
           sm={{ span: 12, order: 2 }}
           md={{ span: 4, order: 3 }}
         >
-          <Tooltip title="Jump to users page" color={rivalData.color.hex}>
-            <a
-              href={rivalData.profile ? rivalData.profile.url : '#'}
-              target={rivalData.profile ? '_blank' : ''}
-              rel="noreferrer"
-            >
-              <Avatar
-                alt="avatar"
-                size={100}
-                className="avatar"
-                style={{
-                  border: `solid ${rivalData.color.hex}`,
-                }}
-                src={
-                  rivalData.profile
-                    ? rivalData.profile.avatar.thumb_url
-                    : process.env.REACT_APP_NOUSER_PNG_URL
-                }
-              />
-            </a>
-          </Tooltip>
-          <p>{rivalData.profile ? rivalData.profile.name : ''}</p>
-          <p>{rivalData.profile ? rivalData.profile.wca_id : ''}</p>
+          <UserProfileBlock userdata={rivalData} />
         </Col>
       </Row>
       <Row className="inputs" justify="space-around" align="middle">
